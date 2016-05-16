@@ -1,21 +1,65 @@
+import 'babel-polyfill';
+import 'source-map-support/register';
+import * as jdklib from 'jdklib';
+
+import ADB from './adb';
+import Device from './device';
+import * as Emulator from './emulator';
+import * as Genymotion from './genymotion';
+import * as SDK from './sdk';
+import * as NDK from './ndk';
+import AndroidManifest from './AndroidManifest';
+import * as util from './util';
+
+export {
+	ADB,
+	AndroidManifest,
+	Device,
+	Emulator,
+	Genymotion,
+	SDK as androidSDK,
+	NDK as androidNDK
+};
+
 /**
- * Main namespace for the ioslib.
+ * Detects current iOS development environment.
  *
- * @copyright
- * Copyright (c) 2014-2015 by Appcelerator, Inc. All Rights Reserved.
- *
- * @license
- * Licensed under the terms of the Apache Public License.
- * Please see the LICENSE included with this distribution for details.
+ * @param {Object} [opts] - An object with various params.
+ * @param {Boolean} [opts.bypassCache=false] - Bypasses the Android environment detection cache and re-queries the system.
+ * @param {String} [opts.androidHomePath] - Path to Android home directory.
+ * @param {String} [opts.sdkPath] - Path to a known Android SDK directory.
+ * @param {String} [opts.ndkPath] - Path to a known Android NDK directory.
+ * @returns {Promise}
  */
+export function detect(opts = {}) {
+	return Promise.all([
+		SDK.detect(opts),
+		NDK.detect(opts),
+		Genymotion.detect(opts),
+		Device.detect(opts),
+		Emulator.detect(opts)
+	])
+	.then(([sdk, ndk, genyenv, devices, emulators]) => {
+		const result = {
+			home: util.expandPath(opts.androidHomePath || process.env.ANDROID_HOME || '~/.android'),
+			sdk: sdk,
+			ndk: ndk,
+			genymotion: genyenv,
+			devices: devices,
+			emulators: emulators
+		};
+
+		return result;
+	});
+}
 
 const
 	async = require('async'),
+	magik = require('./lib/utilities').magik,
 
 	certs        = exports.certs        = require('./lib/certs'),
 	device       = exports.device       = require('./lib/device'),
 	env          = exports.env          = require('./lib/env'),
-	magik        = exports.magik        = require('./lib/utilities').magik,
 	provisioning = exports.provisioning = require('./lib/provisioning'),
 	simulator    = exports.simulator    = require('./lib/simulator'),
 	utilities    = exports.utilities    = require('./lib/utilities'),
@@ -40,7 +84,7 @@ exports.findValidDeviceCertProfileCombos = findValidDeviceCertProfileCombos;
  * @param {Boolean} [options.validOnly=true] - When true, only returns non-expired, valid certificates.
  * @param {String} [options.xcodeSelect] - Path to the <code>xcode-select</code> executable
  * @param {Function} [callback(err, info)] - A function to call when all detection tasks have completed.
- */
+ *
 function detect(options, callback) {
 	return magik(options, callback, function (emitter, options, callback) {
 		if (cache && !options.bypassCache) {
@@ -130,7 +174,7 @@ function detect(options, callback) {
  * @param {String} [options.appId] - The app identifier (com.domain.app) to filter provisioning profiles by.
  * @param {Boolean} [options.bypassCache=false] - When true, re-detects the all iOS information.
  * @param {Function} [callback(err, info)] - A function to call when the simulator has launched.
- */
+ *
 function findValidDeviceCertProfileCombos(options, callback) {
 	if (typeof options === 'function') {
 		callback = options;
@@ -197,3 +241,4 @@ function findValidDeviceCertProfileCombos(options, callback) {
 		});
 	});
 }
+*/

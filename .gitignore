@@ -1,8 +1,12 @@
 ._*
 .DS_Store
-npm-debug.log
-node_modules
+/coverage
+/dist
+/docs
 env.properties
+node_modules
+npm-debug.log
+/npm-shrinkwrap.json
 
 test/TestApp/info.plist
 test/TestApp/build

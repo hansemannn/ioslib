@@ -1,9 +1,17 @@
 ._*
+.babelrc
 .DS_Store
+.eslintrc
 .git*
+.travis.yml
+coverage
+docs
+env.properties
+gulpfile.js
 node_modules
 npm-debug.log
-env.properties
+src
+test
 
 test/TestApp/info.plist
 test/TestApp/build
